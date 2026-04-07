@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-textMain antialiased font-sans overflow-x-hidden selection:bg-accent selection:text-white pb-0 m-0;
+  }
+}
+
+
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FCFCFD;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E5E5EA;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D1D1D6;
+}
+
+/* Glassmorphism utilities */
+@layer utilities {
+  .glass {
+    @apply bg-primary/70 backdrop-blur-xl border border-accent/5 shadow-sm;
+  }
+
+  .animate-bg-gradient {
+    background: linear-gradient(-45deg, theme('colors.background'), #364234, theme('colors.background'));
+    background-size: 400% 400%;
+    animation: gradient-move 10s ease infinite;
+  }
+}
+
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Custom micro-animations */
+@layer components {
+  .btn-magnetic {
+    @apply relative overflow-hidden transition-all duration-300;
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .btn-magnetic:hover {
+    transform: scale(1.03);
+  }
+
+  .interactive-lift {
+    @apply transition-transform duration-300;
+  }
+
+  .interactive-lift:hover {
+    transform: translateY(-2px);
+  }
+}
