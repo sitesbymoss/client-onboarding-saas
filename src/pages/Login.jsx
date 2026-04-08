@@ -34,9 +34,6 @@ export default function Login() {
         <div className="bg-primary rounded-[2.5rem] border border-accent/10 p-8 md:p-10 shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
             <div className="mb-10 text-center">
-              <div className="w-16 h-16 bg-accent rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-accent/20">
-                <LogIn size={28} className="text-primary" />
-              </div>
               <h1 className="text-3xl font-bold text-textMain mb-2 tracking-tight">Welcome Back</h1>
               <p className="text-textMuted text-sm">Sign in to manage your client portals.</p>
             </div>

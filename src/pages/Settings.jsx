@@ -1,8 +1,42 @@
-import React, { useState } from 'react';
-import { Upload, Building2, Lock, Save } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Upload, Building2, Lock, Save, Loader2 } from 'lucide-react';
+import { useAuth } from '../lib/AuthProvider';
+import { supabase } from '../lib/supabase';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('company');
+  const { user, orgId, orgDetails, refreshOrg } = useAuth();
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("File is too big. Max size is 2MB.");
+      return;
+    }
+
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result;
+      const { error } = await supabase
+        .from('organizations')
+        .update({ logo_url: base64String })
+        .eq('id', orgId);
+
+      if (error) {
+        alert("Failed to save logo.");
+        console.error(error);
+      } else {
+        await refreshOrg();
+      }
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="max-w-5xl mx-auto xl:px-4 pb-20">
@@ -48,12 +82,28 @@ export default function Settings() {
               <section className="bg-primary p-8 rounded-3xl border border-accent/5 shadow-sm">
                 <h2 className="text-xl font-bold text-textMain mb-6">Company Logo</h2>
                 <div className="flex flex-col sm:flex-row items-center gap-6">
-                  <div className="w-24 h-24 rounded-full bg-background border-2 border-dashed border-accent/20 flex inset-0 justify-center items-center shrink-0">
-                    <Building2 size={32} className="text-textMuted/50" />
+                  <div className="w-24 h-24 rounded-full bg-background border-2 border-dashed border-accent/20 flex inset-0 justify-center items-center shrink-0 overflow-hidden">
+                    {orgDetails?.logo_url ? (
+                      <img src={orgDetails.logo_url} alt="Company Logo" className="w-full h-full object-cover" />
+                    ) : (
+                      <Building2 size={32} className="text-textMuted/50" />
+                    )}
                   </div>
                   <div className="flex-1 w-full">
-                    <button className="w-full sm:w-auto flex justify-center items-center gap-2 bg-background border border-accent/20 px-5 py-2.5 rounded-xl font-semibold text-textMain hover:bg-black/5 transition-colors text-sm mb-2">
-                      <Upload size={16} /> Upload New Logo
+                    <input 
+                      type="file" 
+                      accept="image/png, image/jpeg, image/webp" 
+                      className="hidden" 
+                      ref={fileInputRef} 
+                      onChange={handleLogoUpload} 
+                    />
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="w-full sm:w-auto flex justify-center items-center gap-2 bg-background border border-accent/20 px-5 py-2.5 rounded-xl font-semibold text-textMain hover:bg-black/5 transition-colors text-sm mb-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                      {uploading ? 'Uploading...' : 'Upload New Logo'}
                     </button>
                     <p className="text-xs text-textMuted">We recommend an image of at least 400x400px. PNG or JPG.</p>
                   </div>
@@ -65,30 +115,20 @@ export default function Settings() {
                 <h2 className="text-xl font-bold text-textMain mb-6">Profile Information</h2>
                 
                 <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-textMain mb-2">Company Name</label>
-                      <input 
-                        type="text" 
-                        defaultValue="Acme Corp"
-                        className="w-full p-3 rounded-xl border border-accent/20 bg-background text-sm text-textMain focus:outline-none focus:border-accent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-textMain mb-2">Industry</label>
-                      <input 
-                        type="text" 
-                        defaultValue="Logistics"
-                        className="w-full p-3 rounded-xl border border-accent/20 bg-background text-sm text-textMain focus:outline-none focus:border-accent"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-textMain mb-2">Name</label>
+                    <input 
+                      type="text" 
+                      defaultValue={user?.user_metadata?.full_name || ""}
+                      className="w-full p-3 rounded-xl border border-accent/20 bg-background text-sm text-textMain focus:outline-none focus:border-accent"
+                    />
                   </div>
 
                   <div>
                     <label className="block text-sm font-semibold text-textMain mb-2">Primary Support Email</label>
                     <input 
                       type="email" 
-                      defaultValue="support@acme.com"
+                      defaultValue={user?.email || ""}
                       className="w-full p-3 rounded-xl border border-accent/20 bg-background text-sm text-textMain focus:outline-none focus:border-accent"
                     />
                     <p className="text-xs text-textMuted mt-2">This email will be visible to your clients in the onboarding portal.</p>

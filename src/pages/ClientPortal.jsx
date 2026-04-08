@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 export default function ClientPortal() {
   const { magic_token } = useParams();
   const [orgName, setOrgName] = useState('');
+  const [orgLogo, setOrgLogo] = useState(null);
   const [clientName, setClientName] = useState('');
   const [projectId, setProjectId] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -25,7 +26,7 @@ export default function ClientPortal() {
       .from('projects')
       .select(`
         id, 
-        clients ( full_name, organizations ( name ) )
+        clients ( full_name, organizations ( name, logo_url ) )
       `)
       .eq('magic_token', magic_token)
       .single();
@@ -34,6 +35,7 @@ export default function ClientPortal() {
       setProjectId(pData.id);
       setClientName(pData.clients?.full_name || 'Client');
       setOrgName(pData.clients?.organizations?.name || 'Partner Platform');
+      setOrgLogo(pData.clients?.organizations?.logo_url || null);
 
       const { data: tData } = await supabase
         .from('project_tasks')
@@ -96,7 +98,10 @@ export default function ClientPortal() {
       {/* Portal Header */}
       <header className="bg-primary border-b border-accent/5 sticky top-0 z-40">
         <div className="max-w-2xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="text-xl font-bold tracking-tight">{orgName}</div>
+          <div className="flex items-center gap-3">
+            {orgLogo && <img src={orgLogo} alt="Logo" className="w-8 h-8 rounded border border-accent/20 object-cover" />}
+            <div className="text-xl font-bold tracking-tight">{orgName}</div>
+          </div>
           <div className="text-sm font-semibold bg-green-100 text-green-700 px-3 py-1 rounded-full">Secure Portal</div>
         </div>
       </header>

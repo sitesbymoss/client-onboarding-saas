@@ -21,10 +21,28 @@ export default function AdminDashboard() {
   const { orgId } = useAuth();
   const [recentProjects, setRecentProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [metrics, setMetrics] = useState({ active: 0, pending: 0, completed: 0 });
 
   useEffect(() => {
-    if (orgId) fetchRecentProjects();
+    if (orgId) {
+      fetchRecentProjects();
+      fetchMetrics();
+    }
   }, [orgId]);
+
+  const fetchMetrics = async () => {
+    const [activeRes, pendingRes, completedRes] = await Promise.all([
+      supabase.from('projects').select('id', { count: 'exact', head: true }).eq('org_id', orgId).neq('status', 'Completed'),
+      supabase.from('projects').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'Pending Upload'),
+      supabase.from('projects').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'Completed')
+    ]);
+
+    setMetrics({
+      active: activeRes.count || 0,
+      pending: pendingRes.count || 0,
+      completed: completedRes.count || 0
+    });
+  };
 
   const fetchRecentProjects = async () => {
     setLoading(true);
@@ -64,9 +82,9 @@ export default function AdminDashboard() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <MetricCard title="Active Projects" value="24" icon={Activity} trend="+12%" />
-        <MetricCard title="Pending Client Uploads" value="7" icon={Clock} trend="-3" />
-        <MetricCard title="Completed Projects" value="142" icon={CheckCircle} />
+        <MetricCard title="Active Projects" value={metrics.active} icon={Activity} />
+        <MetricCard title="Pending Client Uploads" value={metrics.pending} icon={Clock} />
+        <MetricCard title="Completed Projects" value={metrics.completed} icon={CheckCircle} />
       </div>
 
       {/* Details Table Section */}

@@ -45,12 +45,9 @@ export default function SignUp() {
       <div className="w-full max-w-[420px]">
         <div className="bg-primary rounded-[2.5rem] border border-accent/10 p-8 md:p-10 shadow-2xl relative overflow-hidden">
           <div className="absolute -top-32 -left-32 w-64 h-64 bg-accent/10 rounded-full blur-[64px] pointer-events-none" />
-          
+
           <div className="relative z-10">
             <div className="mb-10 text-center">
-              <div className="w-16 h-16 bg-accent rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-accent/20">
-                <Rocket size={28} className="text-primary" />
-              </div>
               <h1 className="text-3xl font-bold text-textMain mb-2 tracking-tight">Get Started</h1>
               <p className="text-textMuted text-sm">Create your organization and onboard faster.</p>
             </div>
@@ -64,8 +61,8 @@ export default function SignUp() {
             <form onSubmit={handleSignUp} className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-textMain mb-2">Full Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
@@ -76,8 +73,8 @@ export default function SignUp() {
 
               <div>
                 <label className="block text-sm font-semibold text-textMain mb-2">Email Address</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@company.com"
@@ -88,8 +85,8 @@ export default function SignUp() {
 
               <div>
                 <label className="block text-sm font-semibold text-textMain mb-2">Password</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"

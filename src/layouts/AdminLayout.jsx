@@ -6,7 +6,7 @@ import { useAuth } from '../lib/AuthProvider';
 export default function AdminLayout() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { session, loading, user, signOut } = useAuth();
+  const { session, loading, user, orgDetails, signOut } = useAuth();
 
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
@@ -83,7 +83,6 @@ export default function AdminLayout() {
             >
               <Menu size={24} />
             </button>
-            <span className="hidden md:inline-block text-xs font-bold uppercase tracking-widest text-textMuted bg-background border border-accent/10 px-3 py-1.5 rounded-full">Acme Corp</span>
           </div>
           
           <div className="flex items-center gap-4 md:gap-6">
@@ -91,6 +90,9 @@ export default function AdminLayout() {
               <Bell size={20} />
             </button>
             <div className="flex items-center gap-3 border-l border-accent/10 pl-4 md:pl-6">
+              {orgDetails?.logo_url && (
+                <img src={orgDetails.logo_url} alt="Organization Logo" className="w-8 h-8 rounded-full border border-accent/20 object-cover" />
+              )}
               <div className="text-right hidden sm:block">
                 <div className="text-sm font-semibold text-textMain">{user?.user_metadata?.full_name || 'Admin User'}</div>
                 <div className="text-xs text-textMuted">{user?.email}</div>
